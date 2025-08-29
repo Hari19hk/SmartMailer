@@ -7,7 +7,16 @@ from smartmailer.utils.types import TemplateModelType
 
 
 class SmartMailer:
-    def __init__(self, sender_email: str, password: str, provider: str, session_name: str):
+    def __init__(self,
+                 sender_email: str,
+                 password: str,
+                 provider: str,
+                 session_name: str,
+                 log_to_file: bool = False,
+                 log_level: str = 'WARNING'):
+
+        # todo: use the new logger everywhere
+
         logger.info(f"Initializing SmartMailer for {sender_email} with provider {provider} and session '{session_name}'")
         self.mailer = MailSender(sender_email, password, provider)
         self.session_manager = SessionManager(session_name)
