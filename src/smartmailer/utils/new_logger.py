@@ -36,30 +36,36 @@ class Logger:
             log_path = os.path.join(self.log_dir, log_filename)
             self.log_file_handle = open(log_path, "w")
 
-    def debug(self, message, file_or_context: str = None):
+    def debug(self, message):
         log_level = "DEBUG"
-        self._log_helper(message, file_or_context, log_level, datetime.now())
+        self._log_helper(message, log_level, datetime.now())
 
-    def info(self, message, file_or_context: str = None):
+    def info(self, message):
         log_level = "INFO"
-        self._log_helper(message, file_or_context, log_level, datetime.now())
+        self._log_helper(message, log_level, datetime.now())
 
-    def warning(self, message, file_or_context: str = None):
+    def warning(self, message):
         log_level = "WARNING"
-        self._log_helper(message, file_or_context, log_level, datetime.now())
+        self._log_helper(message, log_level, datetime.now())
 
-    def error(self, message, file_or_context: str = None):
+    def error(self, message):
         log_level = "ERROR"
-        self._log_helper(message, file_or_context, log_level, datetime.now())
+        self._log_helper(message, log_level, datetime.now())
 
-    def critical(self, message, file_or_context: str = None):
+    def critical(self, message):
         log_level = "CRITICAL"
-        self._log_helper(message, file_or_context, log_level, datetime.now())
+        self._log_helper(message, log_level, datetime.now())
 
 
-    def _log_helper(self, message: str, file_or_context: str, log_level: str, timestamp: datetime):
+    def _log_helper(self, message: str, log_level: str, timestamp: datetime):
         caller = getframeinfo(stack()[2][0])
+        # entry 0 is this function
+        # entry 1 is what called _log_helper - which is the debug(), info() and family
+        # entry 2 is what called the debug(), info() and such - this is the file which logged the entry
+        # hence the stack()[2]
         filename = os.path.relpath(caller.filename, self.cwd)
+        # we get the relative path of the filename to the current working directory,
+        # from the absolute path given to us.
 
         if LOG_LEVELS.index(self.log_level) <= LOG_LEVELS.index(log_level):
             self._dispatch_message(message, f"{filename} L{caller.lineno}", log_level, timestamp)
