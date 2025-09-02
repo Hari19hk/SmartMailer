@@ -30,6 +30,11 @@ class Logger:
         self.log_line_format = '%Y-%m-%d %H:%M:%S'
         self.cwd = os.getcwd()
 
+        if log_level not in LOG_LEVELS:
+            old_level = log_level
+            self.log_level = "INFO"
+            self._log_helper(f"Log Level {old_level} not found in {LOG_LEVELS}. Defaulting to INFO.", "WARNING", datetime.now())
+            
         if self.log_to_file:
             if not os.path.exists(self.log_dir):
                 os.makedirs(self.log_dir)
@@ -37,9 +42,6 @@ class Logger:
             log_path = os.path.join(self.log_dir, log_filename)
             self.log_file_handle = open(log_path, "w")
 
-        if log_level not in LOG_LEVELS:
-            print(f"Log Level {log_level} not found in {LOG_LEVELS}. Defaulting to INFO.")
-            self.log_level = "INFO"
 
     def debug(self, message):
         log_level = "DEBUG"
