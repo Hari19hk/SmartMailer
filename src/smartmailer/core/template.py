@@ -2,6 +2,7 @@ from typing import Optional, Dict
 from pydantic import BaseModel, model_validator, computed_field
 import re
 import json
+from jinja2 import Template
 
 def get_placeholder_regex(key) -> re.Pattern:
     pattern = r"\{\{ *KEY *\}\}".replace("KEY", key)
@@ -42,20 +43,17 @@ class TemplateEngine:
         self.html = body_html
 
     def render(self, fields: TemplateModel) -> Dict[str, str]:
-        res: dict = {
-            "subject": self.subject,
-            "text": self.text,
-            "html": self.html
-        }
+        data = fields.model_dump()
 
-        for key, value in fields.model_dump().items():
-            regex = get_placeholder_regex(key)
+        res: dict = {}
 
-            if self.subject:
-                res["subject"] = regex.sub(str(value), res["subject"])
-            if self.text:
-                res["text"] = regex.sub(str(value), res["text"])
-            if self.html:
-                res["html"] = regex.sub(str(value), res["html"])
+        if self.subject:
+            res["subject"] = Template(self.subject).render(**data)
+
+        if self.text:
+            res["text"] = Template(self.text).render(**data)
+
+        if self.html:
+            res["html"] = Template(self.html).render(**data)
 
         return res
