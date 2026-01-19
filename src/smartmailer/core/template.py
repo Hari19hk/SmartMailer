@@ -1,12 +1,11 @@
 from typing import Optional, Dict
 from pydantic import BaseModel, model_validator, computed_field
-import re
 import json
-from jinja2 import Template
+import re
+from jinja2 import Environment, StrictUndefined , TemplateError
 
-def get_placeholder_regex(key) -> re.Pattern:
-    pattern = r"\{\{ *KEY *\}\}".replace("KEY", key)
-    return re.compile(pattern)
+
+
 
 class TemplateModel(BaseModel):
     @model_validator(mode='after')
@@ -37,23 +36,32 @@ class TemplateEngine:
     text: Optional[str] = None
     html: Optional[str] = None
 
-    def __init__(self, subject: Optional[str] = None, body_text: Optional[str] = None, body_html: Optional[str] = None):
+    def __init__(self, subject=None, body_text=None, body_html=None):
         self.subject = subject
         self.text = body_text
         self.html = body_html
+        self.env = Environment(undefined=StrictUndefined)
+    
+    def _render_template(self, template: str, data: dict, name: str) -> str:
+        try:
+            return self.env.from_string(template).render(**data)
+        except TemplateError as e:
+            raise ValueError(f"Template rendering failed ({name} template): {e}") from e
+
+
 
     def render(self, fields: TemplateModel) -> Dict[str, str]:
         data = fields.model_dump()
-
         res: dict = {}
 
         if self.subject:
-            res["subject"] = Template(self.subject).render(**data)
+            res["subject"] = self._render_template(self.subject, data, "subject")
 
         if self.text:
-            res["text"] = Template(self.text).render(**data)
+            res["text"] = self._render_template(self.text, data, "text")
 
         if self.html:
-            res["html"] = Template(self.html).render(**data)
+            res["html"] = self._render_template(self.html, data, "html")
 
         return res
+
