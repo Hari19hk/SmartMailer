@@ -128,7 +128,7 @@ class MailSender:
             self.logger.error(f"Couldn't send email to {to_email}: {e}")
             return False
         
-    def preview_email(self, example: dict[str, Any]) -> None:
+    def preview_email(self, example: dict[str, Any], timer:int) -> None:
         print("\nPREVIEW:")
         print(f"To          : {example.get('to_email')}")
         print(f"Subject     : {example.get('subject')}")
@@ -137,7 +137,7 @@ class MailSender:
         print("\nBODY (HTML):")
         print(example.get('html_content') or "(no HTML content)")
         print("\n\n")
-        print("Sending will start in 5 seconds...Press Ctrl+C to cancel.")
+        print(f"Sending will start in {timer} seconds...Press Ctrl+C to cancel.")
 
 
     def send_bulk_mail(
@@ -147,6 +147,8 @@ class MailSender:
         attachment_paths: Optional[list[str]] = None,
         cc: Optional[list[str]] = None,
         bcc: Optional[list[str]] = None,
+        show_preview: bool = True,
+        preview_timer: int = 5
     ) -> None:
         server = None
         server_closed = False
@@ -156,18 +158,19 @@ class MailSender:
             server.login(self.sender_email, self.password)
             self.logger.info(f"Connected to SMTP server {self.smtp_server} as {self.sender_email}")
         
-            first = recipients[0]
-            self.preview_email(first)
-
-            try:
-                time.sleep(5)
-            except KeyboardInterrupt:
-                self.logger.info("Email sending canceled by user.")
-                if server and not server_closed:
-                    server.quit()
-                    self.logger.info("SMTP server connection closed.")
-                    server_closed = True
-                sys.exit(0)
+            if show_preview and recipients:
+                first = recipients[0]
+                self.preview_email(first, timer= preview_timer)
+                if preview_timer and preview_timer > 0:
+                    try:
+                        time.sleep(preview_timer)
+                    except KeyboardInterrupt:
+                        self.logger.info("Email sending canceled by user.")
+                        if server and not server_closed:
+                            server.quit()
+                            self.logger.info("SMTP server connection closed.")
+                            server_closed = True
+                        sys.exit(0)
 
             for row in recipients:
                     try:
