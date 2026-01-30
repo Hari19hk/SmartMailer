@@ -144,9 +144,10 @@ class ToDictModel:
 def test_validate_single_with_to_dict(parser, validator, renderer):
     parser.extract_variables.return_value = {"name"}
     model = ToDictModel("abc")
+    renderer.render.return_value = "Hello abc"
     engine = TemplateEngine(parser, validator, renderer, text="Hello {{ name }}")
     result = engine.render(model)
-    assert result["text"] == renderer.render.return_value
+    assert result["text"] == "Hello abc"
 
 
 def test_validator_called(parser, validator, renderer, model):

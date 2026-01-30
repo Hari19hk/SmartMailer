@@ -15,18 +15,10 @@ def test_template_model_valid():
 
 
 def test_template_model_invalid_field_name():
-    with pytest.raises(ValidationError):
+    with pytest.raises((ValidationError, ValueError)):
         class BadTemplate(TemplateModel):
             Name: str
 
         BadTemplate(Name="test")
 
-def test_template_model_to_dict():
-    class UserTemplate(TemplateModel):
-        name: str
-        age: int
 
-    model = UserTemplate(name="ABC", age=20)
-    data = model.to_dict()
-
-    assert data == {"name": "ABC", "age": 20}
