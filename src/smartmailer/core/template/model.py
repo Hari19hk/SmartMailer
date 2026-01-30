@@ -5,7 +5,7 @@ import re
 import json
 import keyword
 
-class AbstractTemplateModel(BaseModel, ABC):
+class AbstractTemplateModel(ABC):
     @abstractmethod
     def to_dict(self) -> Dict[str, object]:
         pass

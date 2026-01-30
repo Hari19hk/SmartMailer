@@ -1,6 +1,7 @@
 from smartmailer.core.template.renderer import JinjaTemplateRenderer
 from jinja2 import Environment
 from typing import Dict, Optional
+import pytest
 
 def test_renderer_basic_replacement():
     env = Environment()
@@ -26,10 +27,6 @@ def test_renderer_empty_template():
     data: Dict[str, object] = {"a": 1}
     out = renderer.render(template, data)
     assert out == ""
-   
-import pytest
-from jinja2 import Environment
-from smartmailer.core.template.renderer import JinjaTemplateRenderer
 
 def test_renderer_invalid_template_syntax():
     env = Environment()
