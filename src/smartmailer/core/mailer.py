@@ -7,7 +7,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 import json
-from typing import Optional, Any
+from typing import Optional, Any, Dict, List, Tuple
 
 from smartmailer.session_management.session_manager import SessionManager
 from smartmailer.utils.new_logger import Logger
@@ -24,10 +24,10 @@ class MailSender:
 
         self.logger.info(f"MailSender initialized for {sender_email} using {provider} provider.")
 
-    def _get_settings(self, provider: str) -> tuple[str, int]:
+    def _get_settings(self, provider: str) -> Tuple[str, int]:
         settings_path = os.path.join(os.path.dirname(__file__), "settings.json")
         with open(settings_path, 'r') as f:
-            settings: dict[str, list[Any]] = json.load(f)
+            settings: Dict[str, List[Any]] = json.load(f)
 
         if provider not in settings:
             self.logger.error(f"Provider '{provider}' not found in settings.")
@@ -53,9 +53,9 @@ class MailSender:
         subject: Optional[str] = None,
         text_content: Optional[str] = None,
         html_content: Optional[str] = None,
-        attachment_paths: Optional[list[str]] = None,
-        cc: Optional[list[str]] = None,
-        bcc: Optional[list[str]] = None,
+        attachment_paths: Optional[List[str]] = None,
+        cc: Optional[List[str]] = None,
+        bcc: Optional[List[str]] = None,
     ) -> MIMEMultipart:
         
         
@@ -99,9 +99,9 @@ class MailSender:
         subject: Optional[str] = None,
         text_content: Optional[str] = None,
         html_content: Optional[str] = None,
-        attachment_paths: Optional[list[str]] = None,
-        cc: Optional[list[str]] = None,
-        bcc: Optional[list[str]] = None,
+        attachment_paths: Optional[List[str]] = None,
+        cc: Optional[List[str]] = None,
+        bcc: Optional[List[str]] = None,
     ) -> bool:
         
         self._validate_email(to_email)
@@ -129,7 +129,7 @@ class MailSender:
             self.logger.error(f"Couldn't send email to {to_email}: {e}")
             return False
         
-    def preview_email(self, example: dict[str, Any], timer:int=5) -> None:
+    def preview_email(self, example: Dict[str, Any], timer:int=5) -> None:
         print("\nPREVIEW:")
         print(f"To          : {example.get('to_email')}")
         print(f"Subject     : {example.get('subject')}")
@@ -143,11 +143,11 @@ class MailSender:
 
     def send_bulk_mail(
         self,
-        recipients: list[dict[str, Any]],
+        recipients: List[Dict[str, Any]],
         session_manager: SessionManager,
-        attachment_paths: Optional[list[str]] = None,
-        cc: Optional[list[str]] = None,
-        bcc: Optional[list[str]] = None,
+        attachment_paths: Optional[List[str]] = None,
+        cc: Optional[List[str]] = None,
+        bcc: Optional[List[str]] = None,
         show_preview: bool = True,
         preview_timer: int = 5
     ) -> None:
