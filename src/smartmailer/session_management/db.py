@@ -2,7 +2,7 @@ import sqlalchemy as db
 from sqlalchemy import Table, create_engine, Column
 from sqlalchemy.orm import Session
 import datetime
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from smartmailer.utils.new_logger import Logger
 
 class Database:
@@ -35,7 +35,7 @@ class Database:
         assert self.engine is not None, "Engine is not initialized."
         self.meta.create_all(self.engine)
     
-    def insert_recipient(self, recipient_hash: str) -> int | None:
+    def insert_recipient(self, recipient_hash: str) -> Optional[int]:
         with Session(self.engine) as session:
             command = self._sent.insert().prefix_with("OR IGNORE").values(
                 recipient_hash=recipient_hash,
